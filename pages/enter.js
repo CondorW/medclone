@@ -66,7 +66,7 @@ function UsernameForm() {
 
   useEffect(() => {
     let timerId = setTimeout(() => {
-      if (username.length > 5 && username !== "") {
+      if (username.length > 5 && username !== "") { //second condition should check whether username already exists in firebase
         console.log("valid");
         setIsValid(true);
       }
@@ -88,9 +88,10 @@ function UsernameForm() {
   };
 
   return (
-    <form action="submit" onSubmit={submitHandler}>
+    <form className="mx-2" action="submit" onSubmit={submitHandler}>
       <input name="username" type="text" onChange={usernameChangeHandler} value={username} placeholder="Enter your Username" />
-      <button disabled={!isValid} type="submit">
+      {!isValid ? <p className="text-red-700">Username does not pass validation criteria</p> : <p className="text-green-700">Your username passses validation criteria</p>}
+      <button className="text-white bg-black px-2 rounded-full font-bold" disabled={!isValid} type="submit">
         Submit
       </button>
     </form>
