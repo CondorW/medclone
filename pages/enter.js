@@ -1,7 +1,7 @@
 import { signInWithPopup, GoogleAuthProvider, signOut } from "firebase/auth";
 import { auth } from "../lib/firebase";
 import { authContext } from "../lib/Context";
-import { useContext } from "react";
+import { useContext, useState, useEffect } from "react";
 
 export default function Enter(props) {
   const { user, username } = useContext(authContext);
@@ -19,7 +19,9 @@ export default function Enter(props) {
     } else {
       return (
         <div>
-          <h1>Hello Google User {user} with site username {username}</h1>
+          <h1>
+            Hello Google User {user} with site username {username}
+          </h1>
           <SignOutButton></SignOutButton>
         </div>
       );
@@ -55,9 +57,42 @@ function SignOutButton() {
   return <button onClick={signOutHandler}>SignOut</button>;
 }
 function UsernameForm() {
+  const [username, setUsername] = useState("");
+  const [isValid, setIsValid] = useState(false);
+
+  const usernameChangeHandler = (event) => {
+    setUsername(event.target.value);
+  }
+
+  useEffect(() => {
+    let timerId = setTimeout(() => {
+      if (username.length > 5 && username !== "") {
+        console.log("valid");
+        setIsValid(true);
+      }
+      else{
+        console.log("invalid");
+        setIsValid(false);
+      }
+    },500);
+
+    return () => {
+      console.log("Clearing timeout");
+      clearTimeout(timerId);
+    };
+  }, [username]);
+
+  const submitHandler = (event) => {
+    event.preventDefault();
+    console.log(event.target.username.value);
+  };
+
   return (
-    <form>
-      <input type="text" placeholder="Enter your Username" />
+    <form action="submit" onSubmit={submitHandler}>
+      <input name="username" type="text" onChange={usernameChangeHandler} value={username} placeholder="Enter your Username" />
+      <button disabled={!isValid} type="submit">
+        Submit
+      </button>
     </form>
   );
 }
