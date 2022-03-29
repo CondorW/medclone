@@ -62,19 +62,19 @@ function UsernameForm() {
 
   const usernameChangeHandler = (event) => {
     setUsername(event.target.value);
-  }
+  };
 
   useEffect(() => {
     let timerId = setTimeout(() => {
-      if (username.length > 5 && username !== "") { //second condition should check whether username already exists in firebase
+      if (username.length > 5 && username !== "") {
+        //second condition should check whether username already exists in firebase
         console.log("valid");
         setIsValid(true);
-      }
-      else{
+      } else {
         console.log("invalid");
         setIsValid(false);
       }
-    },500);
+    }, 500);
 
     return () => {
       console.log("Clearing timeout");
@@ -89,9 +89,27 @@ function UsernameForm() {
 
   return (
     <form className="mx-2" action="submit" onSubmit={submitHandler}>
-      <input name="username" type="text" onChange={usernameChangeHandler} value={username} placeholder="Enter your Username" />
-      {!isValid ? <p className="text-red-700">Username does not pass validation criteria</p> : <p className="text-green-700">Your username passses validation criteria</p>}
-      <button className="text-white bg-black px-2 rounded-full font-bold" disabled={!isValid} type="submit">
+      <input
+        name="username"
+        type="text"
+        onChange={usernameChangeHandler}
+        value={username}
+        placeholder="Enter your Username"
+      />
+      {!isValid ? (
+        <p className="text-red-700">
+          Username does not pass validation criteria
+        </p>
+      ) : (
+        <p className="text-green-700">
+          Your username passses validation criteria
+        </p>
+      )}
+      <button
+        className="text-white bg-black px-2 rounded-full font-bold"
+        disabled={!isValid}
+        type="submit"
+      >
         Submit
       </button>
     </form>
