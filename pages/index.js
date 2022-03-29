@@ -1,11 +1,10 @@
 import Loader from "../components/Loader"
+import toast from "react-hot-toast"
 
 export default function Home() {
   return (
     <div>
-    <h1 className="text-3xl font-bold underline">
-      Hello world!
-    </h1>
+    <button onClick={()=>{toast.success('Damn I did that without reading the docs ;)')}}>Wanna hear a secret</button>
     </div>
   )
 }
