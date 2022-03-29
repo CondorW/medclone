@@ -1,30 +1,63 @@
-import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { signInWithPopup, GoogleAuthProvider, signOut } from "firebase/auth";
 import { auth } from "../lib/firebase";
+import { authContext } from "../lib/Context";
+import { useContext } from "react";
 
-export default function Enter() {
-  const user = null;
-  const username = null;
+export default function Enter(props) {
+  const { user, username } = useContext(authContext);
+
+  console.log(user, username);
 
   if (user) {
     if (!username) {
-      return <UsernameForm></UsernameForm>;
+      return (
+        <div>
+          <h1>Hello Google User {user}</h1>
+          <UsernameForm></UsernameForm>
+        </div>
+      );
     } else {
-      return <SignOutButton></SignOutButton>;
+      return (
+        <div>
+          <h1>Hello Google User {user} with site username {username}</h1>
+          <SignOutButton></SignOutButton>
+        </div>
+      );
     }
   } else {
     return <SignInButton></SignInButton>;
   }
 }
+
 function SignInButton() {
-  // Need to wrap this in a try catch block for the case that authentication fails
   const signInWithGoogle = async () => {
-      const provider = new GoogleAuthProvider();
-      signInWithPopup(auth,provider).then((result)=>{console.log(result)}).catch((error)=>{console.log(error)})
+    const provider = new GoogleAuthProvider();
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
-  //End of ToDO
   return <button onClick={signInWithGoogle}>Sign in with GoOgLe</button>;
 }
 function SignOutButton() {
-  return <button onClick={() => auth.signOut()}>SignOut</button>;
+  const signOutHandler = async () => {
+    signOut(auth)
+      .then(() => {
+        console.log("signed out");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+  return <button onClick={signOutHandler}>SignOut</button>;
 }
-function UsernameForm() {}
+function UsernameForm() {
+  return (
+    <form>
+      <input type="text" placeholder="Enter your Username" />
+    </form>
+  );
+}

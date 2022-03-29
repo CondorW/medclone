@@ -1,8 +1,9 @@
 import Link from "next/link";
+import { useContext } from "react";
+import { authContext } from "../lib/Context";
 
 export default function Navbar() {
-  const user = null;
-  const username = null;
+  const {user,username} = useContext(authContext);
 
   if (username) {
     return (
