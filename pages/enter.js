@@ -1,5 +1,6 @@
 import { signInWithPopup, GoogleAuthProvider, signOut } from "firebase/auth";
-import { auth } from "../lib/firebase";
+import { collection, doc, setDoc, getDoc } from "firebase/firestore";
+import { auth, db } from "../lib/firebase";
 import { authContext } from "../lib/Context";
 import { useContext, useState, useEffect } from "react";
 
@@ -59,17 +60,30 @@ function SignOutButton() {
 function UsernameForm() {
   const [username, setUsername] = useState("");
   const [isValid, setIsValid] = useState(false);
+  const { user } = useContext(authContext);
 
   const usernameChangeHandler = (event) => {
     setUsername(event.target.value);
   };
 
   useEffect(() => {
-    let timerId = setTimeout(() => {
-      if (username.length > 5 && username !== "") {
-        //second condition should check whether username already exists in firebase
-        console.log("valid");
+    const validationRegex =
+      /^(?=[a-zA-Z0-9._]{3,15}$)(?!.*[_.]{2})[^_.].*[^_.]$/;
+
+    const checkUsername = async () => {
+      const docRef = doc(db, `usernames/${username}`);
+      const docSnap = await getDoc(docRef);
+      console.log("Firestore read executed");
+      if (docSnap.exists()) {
+        setIsValid(false);
+      } else {
         setIsValid(true);
+      }
+    };
+
+    let timerId = setTimeout(() => {
+      if (username.length > 5 && validationRegex.test(username)) {
+        checkUsername();
       } else {
         console.log("invalid");
         setIsValid(false);
@@ -82,9 +96,14 @@ function UsernameForm() {
     };
   }, [username]);
 
-  const submitHandler = (event) => {
+  const submitHandler = async (event) => {
     event.preventDefault();
-    console.log(event.target.username.value);
+    console.log(auth.lastNotifiedUid);
+    await setDoc(doc(db, "users", auth.lastNotifiedUid), {
+      displayName: user,
+      username: username,
+    });
+    await setDoc(doc(db, "usernames", username), { uid: auth.lastNotifiedUid });
   };
 
   return (
