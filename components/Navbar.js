@@ -5,7 +5,7 @@ import { authContext } from "../lib/Context";
 export default function Navbar() {
   const {user,username} = useContext(authContext);
 
-  if (username) {
+  if (user !== null && username !== null) {
     return (
       <nav>
         <div className="flex justify-between px-20">

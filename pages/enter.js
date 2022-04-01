@@ -1,8 +1,9 @@
 import { signInWithPopup, GoogleAuthProvider, signOut } from "firebase/auth";
-import { collection, doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 import { auth, db } from "../lib/firebase";
 import { authContext } from "../lib/Context";
 import { useContext, useState, useEffect } from "react";
+import toast from "react-hot-toast";
 
 export default function Enter(props) {
   const { user, username } = useContext(authContext);
@@ -97,7 +98,7 @@ function UsernameForm() {
   }, [username]);
 
   const submitHandler = async (event) => {
-    event.preventDefault();
+    // event.preventDefault();
     console.log(auth.lastNotifiedUid);
     await setDoc(doc(db, "users", auth.lastNotifiedUid), {
       displayName: user,
@@ -128,6 +129,9 @@ function UsernameForm() {
         className="text-white bg-black px-2 rounded-full font-bold"
         disabled={!isValid}
         type="submit"
+        onClick={() => {
+          toast.success("Username set!");
+        }}
       >
         Submit
       </button>
