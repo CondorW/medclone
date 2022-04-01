@@ -3,6 +3,7 @@ import { doc, setDoc, getDoc } from "firebase/firestore";
 import { auth, db } from "../lib/firebase";
 import { authContext } from "../lib/Context";
 import { useContext, useState, useEffect } from "react";
+import Link from "next/link";
 import toast from "react-hot-toast";
 
 export default function Enter(props) {
@@ -98,13 +99,14 @@ function UsernameForm() {
   }, [username]);
 
   const submitHandler = async (event) => {
-    // event.preventDefault();
+    event.preventDefault();
     console.log(auth.lastNotifiedUid);
     await setDoc(doc(db, "users", auth.lastNotifiedUid), {
       displayName: user,
       username: username,
     });
     await setDoc(doc(db, "usernames", username), { uid: auth.lastNotifiedUid });
+    window.location.reload();
   };
 
   return (
@@ -125,16 +127,14 @@ function UsernameForm() {
           Your username passses validation criteria
         </p>
       )}
-      <button
-        className="text-white bg-black px-2 rounded-full font-bold"
-        disabled={!isValid}
-        type="submit"
-        onClick={() => {
-          toast.success("Username set!");
-        }}
-      >
-        Submit
-      </button>
+        <button
+          className="text-white bg-black px-2 rounded-full font-bold"
+          disabled={!isValid}
+          type="submit"
+          onClick={() => {
+            toast.success("Username set!");
+          }}
+        >Submit</button>
     </form>
   );
 }

@@ -19,7 +19,7 @@ export default function Navbar() {
               Write Post
             </button>
           </Link>
-          <Link href="/profile">
+          <Link href={`/${username}`}>
             <button className="bg-black px-6 py-3 rounded-md text-2xl font-bold  text-white m-2">
               Profile
             </button>
