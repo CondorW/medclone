@@ -9,8 +9,6 @@ import toast from "react-hot-toast";
 export default function Enter(props) {
   const { user, username } = useContext(authContext);
 
-  console.log(user, username);
-
   if (user) {
     if (!username) {
       return (
@@ -100,7 +98,6 @@ function UsernameForm() {
 
   const submitHandler = async (event) => {
     event.preventDefault();
-    console.log(auth.lastNotifiedUid);
     await setDoc(doc(db, "users", auth.lastNotifiedUid), {
       displayName: user,
       username: username,
