@@ -3,7 +3,7 @@ import { authContext } from "../../lib/Context";
 import { getUserWithUsername, db, postToJSON } from "../../lib/firebase";
 import PostFeed from "../../components/PostFeed";
 import UserProfile from "../../components/UserProfile";
-import { collection, getDocs, limit } from "firebase/firestore";
+import { collection, getDocs, limit, orderBy } from "firebase/firestore";
 import { query as fbQuery } from "firebase/firestore";
 
 
@@ -12,8 +12,8 @@ export async function getServerSideProps({ query }) {
   
 
   const userID = await getUserWithUsername(username);
-  const postRef = collection(db, `users/3XcL6borLNMZlpqufms1YUCQwA72/posts`);
-  const postQuery =  fbQuery(postRef);
+  const postRef = collection(db, `users/${userID}/posts`);
+  const postQuery =  fbQuery(postRef,orderBy("createdAt","desc"),limit(3));
   const querySnapshot = await getDocs(postQuery);
   const postArr = [];
   querySnapshot.forEach((doc) => {

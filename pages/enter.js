@@ -3,7 +3,6 @@ import { doc, setDoc, getDoc } from "firebase/firestore";
 import { auth, db } from "../lib/firebase";
 import { authContext } from "../lib/Context";
 import { useContext, useState, useEffect } from "react";
-import Link from "next/link";
 import toast from "react-hot-toast";
 
 export default function Enter(props) {
