@@ -1,8 +1,59 @@
-import Loader from "../components/Loader"
+import { collectionGroup, limit, query, getDocs, startAfter, orderBy, Timestamp } from "firebase/firestore";
+import { db, postToJSON } from "../lib/firebase";
+import PostFeed from "../components/PostFeed";
+import { useState } from "react";
+import Loader from "../components/Loader";
 
-export default function Home() {
+const LIMIT = 1;
+
+export async function getServerSideProps(context) {
+  const postQuery = query(collectionGroup(db, "posts"), limit(LIMIT));
+  const querySnapshot = await getDocs(postQuery);
+  console.log("Database Read Executed");
+  const postArr = [];
+  querySnapshot.forEach((doc) => {
+    console.log(doc.id, " => ", doc.data());
+    postArr.push(postToJSON(doc));
+  });
+  const timeStamp = JSON.stringify(querySnapshot.docs[querySnapshot.docs.length - 1].data().createdAt);
+
+  return { props: { postArr, timeStamp } };
+}
+
+export default function Home(props) {
+  const [postArr, setPostArr] = useState(props.postArr);
+  const [isLoading, setIsLoading] = useState(false);
+  const [postEnd, setPostEnd] = useState(false);
+
+  const jsTs = JSON.parse(props.timeStamp);
+  const cursor = new Timestamp(jsTs.seconds, jsTs.nanoseconds);
+
+  const getMorePostsHandler = async () => {
+    setIsLoading(true);
+
+    const nextQuery = query(collectionGroup(db, "posts"), limit(LIMIT),orderBy("createdAt","asc"),startAfter(cursor));
+    const nextQuerySnapshot = await getDocs(nextQuery);
+    console.log("Database Read Executed");
+    //TODO add the queried document to the array, which is stored in postArr state
+    const nextPostsArr = [];
+    nextQuerySnapshot.forEach((doc) => {
+      nextPostsArr.push(postToJSON(doc));
+    });
+    setPostArr((postArr)=>{
+      return [...postArr,...nextPostsArr];
+    })
+    console.log(postArr)
+    setIsLoading(false);
+  };
+
   return (
-    <div>
+    <div className="mx-4 my-4">
+      <PostFeed posts={postArr} />
+      {!isLoading && !postEnd && (
+        <button onClick={getMorePostsHandler}>Load More</button>
+      )}
+      <Loader show={isLoading}></Loader>
+      {postEnd && <p>No more posts</p>}
     </div>
-  )
+  );
 }

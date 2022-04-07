@@ -10,7 +10,7 @@ export default function PostFeed(props) {
 }
 
 function PostItem(props) {
-  const { post, key } = props;
+  const { post } = props;
   const wordCount = post?.content.split(" ").length;
   const readTime = (wordCount / 200).toFixed(2);
 

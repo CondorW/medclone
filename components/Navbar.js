@@ -9,7 +9,7 @@ export default function Navbar() {
     return (
       <nav>
         <div className="flex justify-between px-20">
-          <Link href="/feed">
+          <Link href="/">
             <button className="bg-black px-6 py-3 rounded-md text-2xl font-bold  text-white m-2">
               FEED
             </button>

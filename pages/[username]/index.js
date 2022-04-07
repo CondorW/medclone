@@ -7,6 +7,9 @@ import { collection, getDocs, limit, orderBy } from "firebase/firestore";
 import { query as fbQuery } from "firebase/firestore";
 
 
+//This page is rendered with SSR, and specific to the user's username.
+//The posts are dynamically fetched based on the query parameters
+
 export async function getServerSideProps({ query }) {
   const { username } = query;
   
