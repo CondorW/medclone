@@ -25,8 +25,9 @@ export default function Home(props) {
   const [isLoading, setIsLoading] = useState(false);
   const [postEnd, setPostEnd] = useState(false);
 
-  const jsTs = JSON.parse(props.timeStamp);
-  const cursor = new Timestamp(jsTs.seconds, jsTs.nanoseconds);
+  const cursor = new Timestamp((postArr[postArr.length - 1].createdAt)/1000, 0);
+  
+
 
   const getMorePostsHandler = async () => {
     setIsLoading(true);
@@ -34,7 +35,6 @@ export default function Home(props) {
     const nextQuery = query(collectionGroup(db, "posts"), limit(LIMIT),orderBy("createdAt","asc"),startAfter(cursor));
     const nextQuerySnapshot = await getDocs(nextQuery);
     console.log("Database Read Executed");
-    //TODO add the queried document to the array, which is stored in postArr state
     const nextPostsArr = [];
     nextQuerySnapshot.forEach((doc) => {
       nextPostsArr.push(postToJSON(doc));
@@ -42,7 +42,10 @@ export default function Home(props) {
     setPostArr((postArr)=>{
       return [...postArr,...nextPostsArr];
     })
-    console.log(postArr)
+    //TODO setPostEnd to true, when there are no more new posts
+    if(nextQuerySnapshot.docs.length < LIMIT){
+      setPostEnd(true);
+    }
     setIsLoading(false);
   };
 
