@@ -5,6 +5,7 @@ import {
   where,
   collection,
 } from "firebase/firestore";
+import MetaTags from "../../components/Metatags";
 import { db, getUserWithUsername, postToJSON } from "../../lib/firebase";
 
 export async function getStaticProps({ params }) {
@@ -51,6 +52,7 @@ export default function UserParam(props) {
   const { post } = props;
   return (
     <div className="px-8 flex justify-between py-10">
+      <MetaTags title="user Post Page"></MetaTags>
       <div>
         <h1>{post.title}</h1>
         <p>{post.content}</p>
@@ -58,6 +60,7 @@ export default function UserParam(props) {
       </div>
       <div>
         <h1>Heart IT</h1>
+        <p>{post.heartCount}</p>
         <button>HEART</button>
       </div>
     </div>
