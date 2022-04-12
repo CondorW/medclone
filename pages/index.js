@@ -28,7 +28,6 @@ export default function Home(props) {
   const cursor = new Timestamp((postArr[postArr.length - 1].createdAt)/1000, 0);
   
 
-
   const getMorePostsHandler = async () => {
     setIsLoading(true);
 
