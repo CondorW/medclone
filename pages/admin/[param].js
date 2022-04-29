@@ -45,11 +45,13 @@ export default function AdminParam(props) {
 
   return (
     <Authcheck>
+      <div>
       <textarea
         value={contentState}
         onChange={(e) => setContentState(e.target.value)}
       ></textarea>
       <button onClick={updatePost}>Save my Edits</button>
+      </div>
     </Authcheck>
   );
 }
