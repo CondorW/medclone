@@ -11,9 +11,6 @@ import Router from "next/router";
 
 
 export default function AdminParam(props) {
-  //TODO Fetch the post with the url param containing the slug of the post from database
-  //Display its content in an html form, where the text area is prepopulated with the content of the post but also editable
-  //Create an update function which saves the updates made to the content property to the database
 
   const [contentState, setContentState] = useState("");
   const [docID, setDocID] = useState("");
