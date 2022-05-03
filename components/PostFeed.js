@@ -1,5 +1,4 @@
-import { toast } from "react-hot-toast";
-
+import HeartButton from "./HeartButton";
 
 export default function PostFeed(props) {
   const { posts } = props;
@@ -23,9 +22,7 @@ function PostItem(props) {
         <p>Estimated Read Time {readTime}</p>
       </div>
       <div className="self-end">
-          <button className="bg-red-600 w-20 rounded p-1 font-semibold" onClick={()=>toast.success('HEART')}>
-          {post.heartCount} Hearts
-          </button>
+          <HeartButton heartCount={post.heartCount}></HeartButton>
       </div>
     </div>
   );
