@@ -1,51 +1,71 @@
-import { collectionGroup, limit, query, getDocs, startAfter, orderBy, Timestamp } from "firebase/firestore";
+import {
+  collectionGroup,
+  limit,
+  query,
+  getDocs,
+  startAfter,
+  orderBy,
+} from "firebase/firestore";
 import { db, postToJSON } from "../lib/firebase";
 import PostFeed from "../components/PostFeed";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Loader from "../components/Loader";
 
-const LIMIT = 1;
-
-export async function getServerSideProps(context) {
-  const postQuery = query(collectionGroup(db, "posts"), limit(LIMIT));
-  const querySnapshot = await getDocs(postQuery);
-  console.log("Database Read Executed");
-  const postArr = [];
-  querySnapshot.forEach((doc) => {
-    console.log(doc.id, " => ", doc.data());
-    postArr.push(postToJSON(doc));
-  });
-  const timeStamp = JSON.stringify(querySnapshot.docs[querySnapshot.docs.length - 1].data().createdAt);
-
-  return { props: { postArr, timeStamp } };
-}
+const LIMIT = 2;
 
 export default function Home(props) {
-  const [postArr, setPostArr] = useState(props.postArr);
+  const [postArr, setPostArr] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [postEnd, setPostEnd] = useState(false);
+  const [querySnap, setQuerySnap] = useState(null);
 
-  const cursor = new Timestamp((postArr[postArr.length - 1].createdAt)/1000, 0);
-  
+  const initialPosts = async () => {
+    const postQuery = query(
+      collectionGroup(db, "posts"),
+      limit(LIMIT),
+      orderBy("createdAt", "asc")
+    );
+    const querySnapshot = await getDocs(postQuery);
+    console.log("Database Read Executed");
+    const stackArr = [];
+    querySnapshot.forEach((doc) => {
+      console.log(doc.id, " => ", doc.data());
+      stackArr.push(postToJSON(doc));
+    });
+    setPostArr(stackArr);
+    setQuerySnap(querySnapshot);
+  };
+
+  useEffect(() => {
+    initialPosts();
+  }, []);
 
   const getMorePostsHandler = async () => {
     setIsLoading(true);
 
-    const nextQuery = query(collectionGroup(db, "posts"), limit(LIMIT),orderBy("createdAt","asc"),startAfter(cursor));
+    console.log(querySnap);
+
+    const nextQuery = query(
+      collectionGroup(db, "posts"),
+      limit(LIMIT),
+      orderBy("createdAt", "asc"),
+      startAfter(querySnap.docs[querySnap.docs.length - 1])
+    );
     const nextQuerySnapshot = await getDocs(nextQuery);
     console.log("Database Read Executed");
     const nextPostsArr = [];
     nextQuerySnapshot.forEach((doc) => {
       nextPostsArr.push(postToJSON(doc));
     });
-    setPostArr((postArr)=>{
-      return [...postArr,...nextPostsArr];
-    })
+    setPostArr((postArr) => {
+      return [...postArr, ...nextPostsArr];
+    });
     //TODO setPostEnd to true, when there are no more new posts
-    if(nextQuerySnapshot.docs.length < LIMIT){
+    if (nextQuerySnapshot.docs.length < LIMIT) {
       setPostEnd(true);
     }
     setIsLoading(false);
+    setQuerySnap(nextQuerySnapshot);
   };
 
   return (

@@ -70,7 +70,6 @@ export default function AdminPage() {
 
   return (
     <Authcheck>
-      <h1>The Admin Page</h1>
       <AdminFeed posts={postState}></AdminFeed>
       <div>
         <form onSubmit={createPost}>
