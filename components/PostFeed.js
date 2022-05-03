@@ -21,9 +21,6 @@ function PostItem(props) {
         <p>{post.slug}</p>
         <p>Estimated Read Time {readTime}</p>
       </div>
-      <div className="self-end">
-          <HeartButton heartCount={post.heartCount}></HeartButton>
-      </div>
     </div>
   );
 }

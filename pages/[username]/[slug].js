@@ -8,10 +8,13 @@ import {
 import MetaTags from "../../components/Metatags";
 import { db, getUserWithUsername, postToJSON } from "../../lib/firebase";
 
+import HeartButton from "../../components/HeartButton";
+
 export async function getStaticProps({ params }) {
   const { username, slug } = params;
   const userDoc = await getUserWithUsername(username);
   let post;
+  let postID;
 
   if (userDoc) {
     //create a firestore query, that finds the post of the provided user with the provided slug, then convert that post to json so it is
@@ -22,10 +25,11 @@ export async function getStaticProps({ params }) {
     console.log("Database Read Executed");
     querySnapshot.forEach((doc) => {
       post = postToJSON(doc);
+      postID = doc.id;
     });
   }
   return {
-    props: { post },
+    props: { post,postID },
     revalidate: 5000,
   };
 }
@@ -49,7 +53,8 @@ export async function getStaticPaths() {
 }
 
 export default function UserParam(props) {
-  const { post } = props;
+  const { post, postID } = props;
+  console.log(postID);
   return (
     <div className="px-8 flex justify-between py-10">
       <MetaTags title="user Post Page"></MetaTags>
@@ -59,9 +64,7 @@ export default function UserParam(props) {
         <p>Written by {post.username}</p>
       </div>
       <div>
-        <h1>Heart IT</h1>
-        <p>{post.heartCount}</p>
-        <button>HEART</button>
+        <HeartButton heartCount={post.heartCount} postID={postID}/>
       </div>
     </div>
   );
