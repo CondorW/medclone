@@ -1,4 +1,4 @@
-import { doc, onSnapshot } from "firebase/firestore";
+import { doc, onSnapshot, setDoc } from "firebase/firestore";
 import { db, getPostIDWithSlug } from "../lib/firebase";
 import toast from "react-hot-toast";
 
@@ -17,10 +17,22 @@ export default function HeartButton(props) {
   const unsub = onSnapshot(
     doc(db, `users/${userID}/posts/${props.postID}/hearts/${userID}`),
     (snapshot) => {
-      snapshot.exists ? setIsLiked(true) : setIsLiked(false);
+      snapshot.exists() ? setIsLiked(true) : setIsLiked(false);
       console.log("hearts snapshot", snapshot);
     }
   );
+const heartClickHandler = async () => {
+  if(!isLiked){
+    await setDoc(doc(db,`users/${userID}/posts/${props.postID}/hearts/`,userID), {uid:userID});
+    toast.success("Post Created");
+  }
+  else{
+
+  }
+}
+
+
+
   if (isLiked) {
     return (
       <button
@@ -34,7 +46,7 @@ export default function HeartButton(props) {
     return (
       <button
         className="bg-red-600 w-20 rounded p-1 font-semibold"
-        onClick={() => toast.success("HEART")}
+        onClick={heartClickHandler}
       >
         {props.heartCount} Hearts
       </button>
