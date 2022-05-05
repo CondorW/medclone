@@ -4,6 +4,7 @@ import {
   onSnapshot,
   setDoc,
   updateDoc,
+  writeBatch,
 } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import toast from "react-hot-toast";
@@ -35,24 +36,33 @@ export default function HeartButton(props) {
   );
 
   const heartClickHandler = async () => {
+    const batch = writeBatch(db);
     if (!isLiked) {
-      await setDoc(
+      batch.set(
         doc(db, `users/${userID}/posts/${props.postID}/hearts/`, userID),
         { uid: userID }
       );
-      await updateDoc(doc(db, `users/${userID}/posts/${props.postID}`), {
+      batch.update(doc(db, `users/${userID}/posts/${props.postID}`), {
         heartCount: increment(1),
       });
       toast.success("Post LIKED");
     } else {
+      batch.delete(
+        doc(db, `users/${userID}/posts/${props.postID}/hearts/${userID}`)
+      );
+      batch.update(doc(db, `users/${userID}/posts/${props.postID}`), {
+        heartCount: increment(-1),
+      });
+      toast.error("Post UNLIKED");
     }
+    await batch.commit();
   };
 
   if (isLiked) {
     return (
       <button
         className="bg-indigo-600 w-20 rounded p-1 font-semibold"
-        onClick={() => toast.error("UNHEARTED")}
+        onClick={heartClickHandler}
       >
         {heartCount} Hearts
       </button>
