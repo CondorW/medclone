@@ -60,7 +60,6 @@ export default function Home(props) {
     setPostArr((postArr) => {
       return [...postArr, ...nextPostsArr];
     });
-    //TODO setPostEnd to true, when there are no more new posts
     if (nextQuerySnapshot.docs.length < LIMIT) {
       setPostEnd(true);
     }
