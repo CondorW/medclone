@@ -1,5 +1,11 @@
-import { doc, onSnapshot, setDoc } from "firebase/firestore";
-import { db, getPostIDWithSlug } from "../lib/firebase";
+import {
+  doc,
+  increment,
+  onSnapshot,
+  setDoc,
+  updateDoc,
+} from "firebase/firestore";
+import { db } from "../lib/firebase";
 import toast from "react-hot-toast";
 
 import { useContext, useState } from "react";
@@ -12,26 +18,35 @@ export default function HeartButton(props) {
   //When the heart button is clicked, post hearts get incremented by 1, and the uid of the currently authenticated user is added to the hearts collection
   //of the corresponding post.
   const [isLiked, setIsLiked] = useState(false);
+  const [heartCount, setHeartCount] = useState(0);
   let { user, userID } = useContext(authContext);
 
-  const unsub = onSnapshot(
+  const unsubWhoHearted = onSnapshot(
     doc(db, `users/${userID}/posts/${props.postID}/hearts/${userID}`),
     (snapshot) => {
       snapshot.exists() ? setIsLiked(true) : setIsLiked(false);
-      console.log("hearts snapshot", snapshot);
     }
   );
-const heartClickHandler = async () => {
-  if(!isLiked){
-    await setDoc(doc(db,`users/${userID}/posts/${props.postID}/hearts/`,userID), {uid:userID});
-    toast.success("Post Created");
-  }
-  else{
+  const unsubHeartCount = onSnapshot(
+    doc(db, `users/${userID}/posts/${props.postID}`),
+    (snapshot) => {
+      snapshot.data() ? setHeartCount(snapshot.data().heartCount) : null;
+    }
+  );
 
-  }
-}
-
-
+  const heartClickHandler = async () => {
+    if (!isLiked) {
+      await setDoc(
+        doc(db, `users/${userID}/posts/${props.postID}/hearts/`, userID),
+        { uid: userID }
+      );
+      await updateDoc(doc(db, `users/${userID}/posts/${props.postID}`), {
+        heartCount: increment(1),
+      });
+      toast.success("Post LIKED");
+    } else {
+    }
+  };
 
   if (isLiked) {
     return (
@@ -39,7 +54,7 @@ const heartClickHandler = async () => {
         className="bg-indigo-600 w-20 rounded p-1 font-semibold"
         onClick={() => toast.error("UNHEARTED")}
       >
-        {props.heartCount} Hearts
+        {heartCount} Hearts
       </button>
     );
   } else {
@@ -48,7 +63,7 @@ const heartClickHandler = async () => {
         className="bg-red-600 w-20 rounded p-1 font-semibold"
         onClick={heartClickHandler}
       >
-        {props.heartCount} Hearts
+        {heartCount} Hearts
       </button>
     );
   }
